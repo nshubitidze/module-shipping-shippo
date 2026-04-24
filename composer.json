@@ -1,0 +1,85 @@
+{
+    "name": "shubo/module-shipping-shippo",
+    "description": "Shippo carrier adapter for Shubo_ShippingCore — first real carrier integration proving the carrier-agnostic abstraction (rate quote, label purchase, webhook, polling).",
+    "type": "magento2-module",
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "keywords": ["magento2", "shipping", "shippo", "carrier", "marketplace", "logistics"],
+    "authors": [
+        {
+            "name": "Shubo",
+            "email": "dev@shubo.ge",
+            "homepage": "https://github.com/nshubitidze/module-shipping-shippo",
+            "role": "Maintainer"
+        }
+    ],
+    "homepage": "https://github.com/nshubitidze/module-shipping-shippo",
+    "support": {
+        "issues": "https://github.com/nshubitidze/module-shipping-shippo/issues",
+        "source": "https://github.com/nshubitidze/module-shipping-shippo"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.1",
+        "ext-bcmath": "*",
+        "ext-json": "*",
+        "magento/framework": ">=103.0",
+        "shubo/module-shipping-core": "@dev"
+    },
+    "require-dev": {
+        "bitexpert/phpstan-magento": "^0.32",
+        "magento/framework": "^103.0.7",
+        "magento/magento-coding-standard": "^37.0",
+        "phpcompatibility/php-compatibility": "*",
+        "phpstan/phpstan": "^1.12",
+        "phpunit/phpunit": "^10.5",
+        "squizlabs/php_codesniffer": "^3.10"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://mirror.mage-os.org/"
+        },
+        {
+            "type": "path",
+            "url": "../module-shipping-core",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Shubo\\ShippingShippo\\": ""
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Shubo\\ShippingShippo\\Test\\": "Test/"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "8.4.0"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "magento/composer-dependency-version-audit-plugin": true,
+            "magento/composer-root-update-plugin": true,
+            "magento/inventory-composer-installer": true,
+            "laminas/laminas-dependency-plugin": true,
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "phpunit": "phpunit",
+        "phpstan": "phpstan analyse",
+        "phpcs": "phpcs"
+    }
+}

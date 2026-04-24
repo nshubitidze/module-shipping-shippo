@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Shubo. All rights reserved.
+  See LICENSE file for license details.
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="shubo_shipping_shippo_transaction"
+           resource="default"
+           engine="innodb"
+           comment="Shippo transaction idempotency + label cache">
+        <column xsi:type="varchar"
+                name="client_tracking_code"
+                nullable="false"
+                length="64"
+                comment="Idempotency key owned by Shubo — mirrors ShipmentInterface.client_tracking_code"/>
+        <column xsi:type="varchar"
+                name="shippo_transaction_id"
+                nullable="false"
+                length="64"
+                comment="Shippo object_id from POST /transactions"/>
+        <column xsi:type="varchar"
+                name="tracking_number"
+                nullable="false"
+                length="128"
+                comment="Carrier tracking number from the label"/>
+        <column xsi:type="varchar"
+                name="carrier"
+                nullable="false"
+                length="32"
+                comment="Shippo carrier token (e.g. usps, dhl_express)"/>
+        <column xsi:type="varchar"
+                name="label_url"
+                nullable="true"
+                length="512"
+                comment="Shippo-hosted label PDF URL"/>
+        <column xsi:type="varchar"
+                name="status"
+                nullable="false"
+                length="32"
+                comment="Last-known Shippo transaction status"/>
+        <column xsi:type="timestamp"
+                name="created_at"
+                nullable="false"
+                default="CURRENT_TIMESTAMP"
+                on_update="false"
+                comment="Row creation timestamp"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="client_tracking_code"/>
+        </constraint>
+
+        <constraint xsi:type="unique" referenceId="SHUBO_SHIPPING_SHIPPO_TX_SHIPPO_TRANSACTION_ID">
+            <column name="shippo_transaction_id"/>
+        </constraint>
+
+        <index referenceId="SHUBO_SHIPPING_SHIPPO_TX_TRACKING_NUMBER" indexType="btree">
+            <column name="tracking_number"/>
+        </index>
+    </table>
+</schema>

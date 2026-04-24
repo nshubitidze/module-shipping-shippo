@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Shubo. All rights reserved.
+  See LICENSE file for license details.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Shubo_ShippingShippo::config"
+                                      title="Shubo_ShippingShippo — Shippo Carrier"
+                                      sortOrder="400"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

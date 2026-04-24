@@ -1,0 +1,20 @@
+{
+    "shubo_shipping_shippo_transaction": {
+        "column": {
+            "client_tracking_code": true,
+            "shippo_transaction_id": true,
+            "tracking_number": true,
+            "carrier": true,
+            "label_url": true,
+            "status": true,
+            "created_at": true
+        },
+        "index": {
+            "SHUBO_SHIPPING_SHIPPO_TX_TRACKING_NUMBER": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SHUBO_SHIPPING_SHIPPO_TX_SHIPPO_TRANSACTION_ID": true
+        }
+    }
+}

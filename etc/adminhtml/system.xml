@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Shubo. All rights reserved.
+  See LICENSE file for license details.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="shubo_shipping_shippo" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="0">
+            <class>separator-top</class>
+            <label>Shippo Carrier</label>
+            <tab>sales</tab>
+            <resource>Shubo_ShippingShippo::config</resource>
+
+            <group id="api" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>API</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="mode" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Mode</label>
+                    <source_model>Shubo\ShippingShippo\Model\Config\Source\Mode</source_model>
+                </field>
+                <field id="key" translate="label comment" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>API Key</label>
+                    <comment>Shippo API key; use `shippo_test_*` in sandbox and `shippo_live_*` only after finance sign-off.</comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="webhook_secret" translate="label comment" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Webhook Shared Secret</label>
+                    <comment>Shared HMAC-SHA256 secret registered with Shippo when creating the webhook.</comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+            </group>
+
+            <group id="service" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Service</label>
+                <field id="allowed_carriers" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Allowed Carriers</label>
+                    <comment>Comma-separated Shippo provider tokens (e.g. `usps,dhl_express`). Leave blank to accept all.</comment>
+                </field>
+                <field id="rate_cache_ttl" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Rate Cache TTL (seconds)</label>
+                    <comment>In-request cache only; prevents duplicate rate calls within the same HTTP request.</comment>
+                    <validate>validate-digits</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

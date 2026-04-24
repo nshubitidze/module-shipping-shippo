@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Shubo. All rights reserved.
+  See LICENSE file for license details.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <shubo_shipping_shippo>
+            <api>
+                <mode>test</mode>
+                <enabled>0</enabled>
+                <key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <webhook_secret backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+            </api>
+            <service>
+                <allowed_carriers></allowed_carriers>
+                <rate_cache_ttl>60</rate_cache_ttl>
+            </service>
+        </shubo_shipping_shippo>
+    </default>
+</config>

@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Shubo. All rights reserved.
+  See LICENSE file for license details.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--
+        Api interface bindings.
+    -->
+    <preference for="Shubo\ShippingShippo\Api\Data\ShippoTransactionInterface"
+                type="Shubo\ShippingShippo\Model\Data\ShippoTransaction"/>
+    <preference for="Shubo\ShippingShippo\Api\ShippoTransactionRepositoryInterface"
+                type="Shubo\ShippingShippo\Model\ShippoTransactionRepository"/>
+
+    <!--
+        Register the Shippo gateway in the ShippingCore CarrierRegistry.
+        Uses the `shippo` code (matches ShippoCarrierGateway::CARRIER_CODE).
+        Must NOT redeclare `shuboflat` — that's core's.
+    -->
+    <type name="Shubo\ShippingCore\Model\Carrier\CarrierRegistry">
+        <arguments>
+            <argument name="gateways" xsi:type="array">
+                <item name="shippo" xsi:type="object">Shubo\ShippingShippo\Model\Adapter\ShippoCarrierGateway</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Register the Shippo webhook handler in the ShippingCore WebhookDispatcher.
+    -->
+    <type name="Shubo\ShippingCore\Model\Webhook\WebhookDispatcher">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="shippo" xsi:type="object">Shubo\ShippingShippo\Model\Webhook\ShippoWebhookHandler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Register the smoke-rate CLI command. Bind on CommandListInterface (not
+        the concrete CommandList) to avoid eager-resolution crashes during
+        setup:install — see Shubo_ShippingCore/etc/di.xml notes.
+    -->
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="shubo_shipping_shippo_smoke_rate"
+                      xsi:type="object">Shubo\ShippingShippo\Console\Command\SmokeRateCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        The SmokeRateCommand takes a CarrierGatewayInterface — pin it to the
+        Shippo gateway so the CLI command doesn't accidentally pull the flat
+        rate adapter in a default install.
+    -->
+    <type name="Shubo\ShippingShippo\Console\Command\SmokeRateCommand">
+        <arguments>
+            <argument name="gateway" xsi:type="object">Shubo\ShippingShippo\Model\Adapter\ShippoCarrierGateway</argument>
+        </arguments>
+    </type>
+</config>

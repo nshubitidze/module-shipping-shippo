@@ -1,0 +1,13 @@
+includes:
+    - vendor/bitexpert/phpstan-magento/extension.neon
+parameters:
+    level: 8
+    paths:
+        - Api
+        - Console
+        - Model
+    excludePaths:
+        - Test/*
+        - vendor/*
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors: []

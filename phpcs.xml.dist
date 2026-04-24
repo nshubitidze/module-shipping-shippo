@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ruleset name="shipping-shippo">
+    <description>Shubo_ShippingShippo coding standard (Magento2 + project strictness)</description>
+    <rule ref="Magento2"/>
+    <file>.</file>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <arg name="colors"/>
+    <arg name="extensions" value="php,phtml"/>
+    <arg name="warning-severity" value="0"/>
+</ruleset>
