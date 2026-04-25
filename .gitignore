@@ -1,8 +1,18 @@
+# Secrets / credentials — never commit
+.env
+.env.*
+*.token
+secrets/
+
+# Build / runtime artifacts
 vendor/
 composer.lock
 .phpunit.cache/
 .phpunit.result.cache
 /var/
+/generated/
+
+# IDE / OS
 /.idea/
 /.vscode/
 *.swp
