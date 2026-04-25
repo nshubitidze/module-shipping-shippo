@@ -126,10 +126,14 @@ class ShippoLifecycleTest extends TestCase
             . implode(' | ', $quoteResponse->errors),
         );
 
-        $cheapest = $this->cheapestRateOption($quoteResponse->options);
-        self::assertGreaterThan(0, $cheapest->priceCents);
-        self::assertNotEmpty($cheapest->carrierCode);
-        $rateObjectId = str_replace('shippo-rate-', '', $cheapest->rationale);
+        // Pin to USPS — Shippo's sandbox UPS account is not activated by
+        // default, and picking the cheapest rate without filtering can land
+        // on UPS which then errors at carrier-account level. USPS works
+        // out-of-the-box on every Shippo sandbox.
+        $usps = $this->cheapestUspsOption($quoteResponse->options);
+        self::assertNotNull($usps, 'Shippo sandbox returned no USPS rate for the lifecycle parcel.');
+        self::assertGreaterThan(0, $usps->priceCents);
+        $rateObjectId = str_replace('shippo-rate-', '', $usps->rationale);
         self::assertNotEmpty($rateObjectId);
 
         // Step 2 - createShipment()
@@ -143,7 +147,7 @@ class ShippoLifecycleTest extends TestCase
             parcel: $quoteRequest->parcel,
             codEnabled: false,
             codAmountCents: 0,
-            preferredCarrierCode: $cheapest->carrierCode,
+            preferredCarrierCode: 'usps',
         );
 
         $shipmentResponse = $this->gateway->createShipment($shipmentRequest);
@@ -226,10 +230,10 @@ class ShippoLifecycleTest extends TestCase
             'carrier_token' => $persisted->getCarrier(),
             'label_url' => $labelUrl,
             'cheapest_rate' => [
-                'carrier' => $cheapest->carrierCode,
-                'method' => $cheapest->methodCode,
-                'price_cents' => $cheapest->priceCents,
-                'eta_days' => $cheapest->etaDays,
+                'carrier' => $usps->carrierCode,
+                'method' => $usps->methodCode,
+                'price_cents' => $usps->priceCents,
+                'eta_days' => $usps->etaDays,
             ],
             'webhook_simulation' => [
                 'normalized_status' => $webhookResult->normalizedStatus,
@@ -325,10 +329,18 @@ class ShippoLifecycleTest extends TestCase
     /**
      * @param list<\Shubo\ShippingCore\Api\Data\Dto\RateOption> $options
      */
-    private function cheapestRateOption(array $options): \Shubo\ShippingCore\Api\Data\Dto\RateOption
+    private function cheapestUspsOption(array $options): ?\Shubo\ShippingCore\Api\Data\Dto\RateOption
     {
-        usort($options, static fn ($a, $b) => $a->priceCents <=> $b->priceCents);
-        return $options[0];
+        $usps = array_values(array_filter(
+            $options,
+            static fn (\Shubo\ShippingCore\Api\Data\Dto\RateOption $opt): bool
+                => strcasecmp($opt->carrierCode, 'usps') === 0,
+        ));
+        if ($usps === []) {
+            return null;
+        }
+        usort($usps, static fn ($a, $b) => $a->priceCents <=> $b->priceCents);
+        return $usps[0];
     }
 
     /**

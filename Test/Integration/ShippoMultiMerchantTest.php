@@ -96,6 +96,13 @@ class ShippoMultiMerchantTest extends TestCase
 
     public function testTwoMerchantsProduceDistinctShippoTransactions(): void
     {
+        // Pin both shipments to USPS via preferredCarrierCode. Shippo's sandbox
+        // sometimes returns UPS as the cheapest rate, but the sandbox UPS
+        // account is not activated by default — purchasing the cheapest UPS
+        // rate then errors at the carrier-account level. Pinning to USPS makes
+        // the test deterministic against any out-of-the-box Shippo sandbox.
+        $preferred = 'usps';
+
         // Merchant 1 — generic Shubo seller, San Francisco origin
         $req1 = $this->buildShipmentRequest(
             merchantId: 1,
@@ -108,6 +115,7 @@ class ShippoMultiMerchantTest extends TestCase
             destState: 'NY',
             destZip: '10001',
             clientCode: 'multi-m1-' . bin2hex(random_bytes(4)),
+            preferredCarrierCode: $preferred,
         );
 
         // Merchant 4 — Tikha (showcase merchant per reference_showcase_merchant.md),
@@ -124,6 +132,7 @@ class ShippoMultiMerchantTest extends TestCase
             destState: 'IL',
             destZip: '60606',
             clientCode: 'multi-m4-' . bin2hex(random_bytes(4)),
+            preferredCarrierCode: $preferred,
         );
 
         // Quote both
@@ -270,6 +279,7 @@ class ShippoMultiMerchantTest extends TestCase
         string $destState,
         string $destZip,
         string $clientCode,
+        ?string $preferredCarrierCode = null,
     ): ShipmentRequest {
         $origin = new ContactAddress(
             name: 'Merchant ' . $merchantId . ' Origin',
@@ -320,7 +330,7 @@ class ShippoMultiMerchantTest extends TestCase
             ),
             codEnabled: false,
             codAmountCents: 0,
-            preferredCarrierCode: null,
+            preferredCarrierCode: $preferredCarrierCode,
         );
     }
 
