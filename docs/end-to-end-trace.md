@@ -90,7 +90,61 @@ The refund ack is recorded below this section once executed (see "Refund acks" a
 
 ## Phase B address validation
 
-(Populated after Phase B smoke CLI runs.)
+### Smoke results (Run: 2026-04-25T08:15:30Z)
+
+Two-input matrix run via `Test/Integration/AddressValidatorSmokeTest` (mirrors the `bin/magento shipping_shippo:smoke-validate-address` CLI; the CLI is held back from duka's bin/magento until the architect's Phase F+G composer-update lands per scope decision §7).
+
+**Known-good (White House):**
+```
+input:    street="1600 Pennsylvania Ave NW" city=Washington state=DC country=US postcode=20500
+output:   valid=true   suggestion=(none)   messages=(none)
+```
+
+**Known-bad (impossible country):**
+```
+input:    street="99999 Fakestreet" city=Nowhere state=ZZ country=XX postcode=00000
+output:   valid=false  suggestion=(none)
+messages:
+  - Shippo request rejected: {"country":["Invalid value specified for country 'XX'"]}
+```
+
+PHPUnit output: `OK (2 tests, 3 assertions)` in 1.36 s.
+
+### Independent read-back via Shippo HTTPS API
+
+`GET https://api.goshippo.com/addresses/?results=3` — confirms the validator's POST against `/addresses?validate=true` actually landed an address record on Shippo's side:
+
+```
+object_id:           8985d30eb1554729ab6badb3d2072afd
+object_created:      2026-04-25T08:15:30.028Z
+street1:             1600 Pennsylvania Ave NW
+city:                Washington
+state:               DC
+zip:                 20500-0005   <-- Shippo upgraded ZIP+4 (informational only)
+country:             US
+longitude:           -77.03511
+latitude:            38.89867
+is_complete:         true
+validation_results:  { is_valid: true, messages: [] }
+test:                true
+```
+
+Diff: zero divergence on the round-tripped fields (street/city/state/country). The ZIP+4 upgrade (`20500` -> `20500-0005`) is Shippo's own enrichment; the validator does not re-write the customer's input on a `valid=true` outcome, by design (their input was accepted; surfacing a "did you mean" for an already-valid address would be UX noise).
+
+The bogus address (`XX/ZZ`) was rejected at HTTP-400 by Shippo BEFORE any address record was created — this is correct behavior; we do not want to pollute the Shippo dashboard with malformed test addresses, and the validator now treats the 4xx as `valid=false` with the message text passed through.
+
+### Behavior matrix proven
+
+| Scenario | Code path | Outcome |
+|---|---|---|
+| Valid address | `validation_results.is_valid=true` | `valid=true`, `suggestion=null`, `messages=[]` |
+| Invalid + suggestion | response carries corrected fields | `valid=false`, `suggestion=ContactAddress`, `messages` populated |
+| Invalid, no suggestion | response carries no corrected fields | `valid=false`, `suggestion=null`, `messages` populated |
+| Shippo 5xx / network | catch in validator | `valid=true` (fail-open), warning logged |
+| Shippo 401/403 | catch in validator | `valid=true` (fail-open), error logged for operator |
+| Shippo 4xx | catch in validator | `valid=false`, `suggestion=null`, message = HTTP body excerpt |
+
+Five scenarios covered by 5 unit tests (`Test/Unit/Service/AddressValidatorTest.php`) + 2 live-sandbox smoke runs. `OK (5 tests, 27 assertions)` for the unit suite; `OK (2 tests, 3 assertions)` for the integration smoke.
 
 ---
 

@@ -48,6 +48,8 @@
             <argument name="commands" xsi:type="array">
                 <item name="shubo_shipping_shippo_smoke_rate"
                       xsi:type="object">Shubo\ShippingShippo\Console\Command\SmokeRateCommand</item>
+                <item name="shubo_shipping_shippo_smoke_validate_address"
+                      xsi:type="object">Shubo\ShippingShippo\Console\Command\SmokeValidateAddressCommand</item>
             </argument>
         </arguments>
     </type>

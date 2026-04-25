@@ -105,6 +105,19 @@ class ShippoClient
     }
 
     /**
+     * POST /addresses with `validate=true` — Shippo's documented address
+     * validation lane. The response envelope mirrors a normal address record
+     * with an extra `validation_results` block ({is_valid, messages[]}).
+     *
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function validateAddress(array $payload): array
+    {
+        return $this->request('POST', '/addresses', $payload + ['validate' => true]);
+    }
+
+    /**
      * Raw GET for binary payloads (label PDF downloads). Returns the exact
      * byte string from the response body without JSON decoding.
      */
