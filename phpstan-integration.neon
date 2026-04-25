@@ -1,0 +1,11 @@
+includes:
+    - vendor/bitexpert/phpstan-magento/extension.neon
+parameters:
+    level: 8
+    paths:
+        - Test/Integration
+    excludePaths:
+        - Test/Integration/_files/*
+    treatPhpDocTypesAsCertain: false
+    bootstrapFiles:
+        - Test/Integration/bootstrap.php
