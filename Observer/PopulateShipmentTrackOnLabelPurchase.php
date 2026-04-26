@@ -72,12 +72,21 @@ class PopulateShipmentTrackOnLabelPurchase implements ObserverInterface
         }
 
         // Idempotency: skip if a track with this number already exists on this shipment.
-        // addFieldToFilter() second arg is array|string|null per the AbstractDb signature,
-        // so wrap the int parent_id in the documented `eq` filter form.
-        $existing = $this->trackCollectionFactory->create()
-            ->addFieldToFilter('parent_id', ['eq' => $magentoShipmentId])
-            ->addFieldToFilter('number', $trackingNumber);
-        if ($existing->getSize() > 0) {
+        // The DB column is `track_number`; the model property `number` is a virtual alias
+        // that only works on in-memory objects — using it in addFieldToFilter() throws
+        // SQLSTATE[42S22] Unknown column 'main_table.number'.
+        try {
+            $existing = $this->trackCollectionFactory->create()
+                ->addFieldToFilter('parent_id', ['eq' => $magentoShipmentId])
+                ->addFieldToFilter(ShipmentTrackInterface::TRACK_NUMBER, ['eq' => $trackingNumber]);
+            if ($existing->getSize() > 0) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            $this->logger->warning(
+                'PopulateShipmentTrackOnLabelPurchase: idempotency check failed, skipping track creation',
+                ['magento_shipment_id' => $magentoShipmentId, 'error' => $e->getMessage()],
+            );
             return;
         }
 
