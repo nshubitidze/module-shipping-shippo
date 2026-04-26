@@ -64,4 +64,26 @@
             <argument name="gateway" xsi:type="object">Shubo\ShippingShippo\Model\Adapter\ShippoCarrierGateway</argument>
         </arguments>
     </type>
+
+    <!--
+        Phase 2: Copy Shippo rate_object_id from quote rates to sales_order at order placement.
+        The rate_object_id is encoded as JSON in quote_shipping_rate.method_description by
+        ShippoMagentoCarrier::buildRateMethod(). No intermediate quote_address storage needed.
+    -->
+    <type name="Magento\Quote\Model\QuoteManagement">
+        <plugin name="shubo_shipping_shippo_copy_rate_object_id_to_order"
+                type="Shubo\ShippingShippo\Plugin\Sales\CopyRateObjectIdToOrderPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <!--
+        Phase 3: Non-blocking Shippo address validation at checkout.
+        See Plugin/Checkout/ValidateShippingAddressPlugin docblock — the plugin
+        only logs Shippo's verdict; it never throws, never gates the rate quote.
+    -->
+    <type name="Magento\Checkout\Api\ShippingInformationManagementInterface">
+        <plugin name="shubo_shipping_shippo_validate_address"
+                type="Shubo\ShippingShippo\Plugin\Checkout\ValidateShippingAddressPlugin"
+                sortOrder="20"/>
+    </type>
 </config>

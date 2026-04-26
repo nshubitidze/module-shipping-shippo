@@ -18,5 +18,14 @@
                 <rate_cache_ttl>60</rate_cache_ttl>
             </service>
         </shubo_shipping_shippo>
+        <carriers>
+            <shippo>
+                <active>0</active>
+                <model>Shubo\ShippingShippo\Model\Carrier\ShippoMagentoCarrier</model>
+                <name>Shippo</name>
+                <title>Shipping via Shippo</title>
+                <sallowspecific>0</sallowspecific>
+            </shippo>
+        </carriers>
     </default>
 </config>

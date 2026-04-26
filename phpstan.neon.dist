@@ -6,6 +6,9 @@ parameters:
         - Api
         - Console
         - Model
+        - Observer
+        - Plugin
+        - Service
     excludePaths:
         - Test/*
         - vendor/*

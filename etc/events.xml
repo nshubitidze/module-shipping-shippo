@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+  Copyright © Shubo. All rights reserved.
+  See LICENSE file for license details.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!--
+        Phase 3: When ShippingCore dispatches a shipment with Shippo, persist
+        a Magento sales_shipment_track row so admin and customer-facing screens
+        can deep-link to the carrier's tracking page.
+    -->
+    <event name="shubo_shipping_shipment_dispatched">
+        <observer name="shubo_shipping_shippo_populate_track"
+                  instance="Shubo\ShippingShippo\Observer\PopulateShipmentTrackOnLabelPurchase"/>
+    </event>
+</config>

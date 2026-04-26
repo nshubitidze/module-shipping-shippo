@@ -16,5 +16,10 @@
             "PRIMARY": true,
             "SHUBO_SHIPPING_SHIPPO_TX_SHIPPO_TRANSACTION_ID": true
         }
+    },
+    "sales_order": {
+        "column": {
+            "shippo_rate_object_id": true
+        }
     }
 }

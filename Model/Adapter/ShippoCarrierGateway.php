@@ -111,6 +111,74 @@ class ShippoCarrierGateway implements CarrierGatewayInterface
             // fall through — first time seeing this code.
         }
 
+        // When the order carries a pre-selected rate_object_id (persisted during checkout),
+        // buy the label directly without requoting — preserves the exact rate the customer saw.
+        $rateObjectId = isset($request->metadata['shippo_rate_object_id'])
+            && is_string($request->metadata['shippo_rate_object_id'])
+            && $request->metadata['shippo_rate_object_id'] !== ''
+            ? $request->metadata['shippo_rate_object_id']
+            : null;
+
+        if ($rateObjectId !== null) {
+            $tx = $this->client->createTransaction($rateObjectId);
+            $status = is_string($tx['status'] ?? null) ? $tx['status'] : '';
+
+            if ($status === self::STATUS_QUEUED) {
+                $this->logger->warning(
+                    'Shippo transaction QUEUED on rate-object-id path',
+                    [
+                        'client_tracking_code' => $request->clientTrackingCode,
+                        'rate_object_id' => $rateObjectId,
+                    ],
+                );
+                throw new ShipmentDispatchFailedException(
+                    __('Shippo transaction queued — retry once async processing completes.'),
+                );
+            }
+
+            if ($status !== self::STATUS_SUCCESS) {
+                $message = $this->extractTxMessage($tx);
+                $this->logger->error(
+                    'Shippo rejected label purchase on rate-object-id path',
+                    [
+                        'client_tracking_code' => $request->clientTrackingCode,
+                        'status' => $status,
+                        'message' => $message,
+                    ],
+                );
+                throw new ShipmentDispatchFailedException(
+                    __('Shippo rejected label purchase: %1', $message),
+                );
+            }
+
+            $trackingNumber = (string)($tx['tracking_number'] ?? '');
+            $labelUrl = isset($tx['label_url']) && is_string($tx['label_url']) && $tx['label_url'] !== ''
+                ? $tx['label_url']
+                : null;
+            $shippoTxId = (string)($tx['object_id'] ?? '');
+            $carrierToken = '';
+            $nested = is_array($tx['rate'] ?? null) ? $tx['rate'] : [];
+            if (is_string($nested['provider'] ?? null) && $nested['provider'] !== '') {
+                $carrierToken = (string)$nested['provider'];
+            }
+
+            $this->persistTransaction(
+                clientTrackingCode: $request->clientTrackingCode,
+                shippoTxId: $shippoTxId,
+                trackingNumber: $trackingNumber,
+                carrier: $carrierToken,
+                labelUrl: $labelUrl,
+                status: self::LOCAL_STATUS_CREATED,
+            );
+
+            return new ShipmentResponse(
+                carrierTrackingId: $trackingNumber,
+                labelUrl: $labelUrl,
+                status: self::LOCAL_STATUS_CREATED,
+                raw: $tx,
+            );
+        }
+
         $quoteRequest = new QuoteRequest(
             merchantId: $request->merchantId,
             origin: $request->origin,
@@ -391,6 +459,9 @@ class ShippoCarrierGateway implements CarrierGatewayInterface
             serviceLevel: $name,
             rationale: 'shippo-rate-' . $objectId,
             pudoExternalId: null,
+            adapterMetadata: $objectId !== ''
+                ? ['rate_object_id' => $objectId, 'carrier_token' => $provider]
+                : null,
         );
     }
 

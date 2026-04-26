@@ -58,4 +58,13 @@
             <column name="tracking_number"/>
         </index>
     </table>
+
+    <!-- Session 6: persist chosen Shippo rate_object_id on the order for admin label purchase -->
+    <table name="sales_order" resource="default" comment="Sales Order">
+        <column xsi:type="varchar"
+                name="shippo_rate_object_id"
+                nullable="true"
+                length="64"
+                comment="Shippo rate object_id chosen at checkout; consumed by label purchase on admin Ship"/>
+    </table>
 </schema>
