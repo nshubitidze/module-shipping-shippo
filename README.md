@@ -20,15 +20,14 @@ Apache 2.0 · Magento 2.4.8 · PHP ≥ 8.1.
 
 ## Install
 
-This module is usually consumed through the main duka marketplace via composer VCS. Standalone:
-
 ```bash
-composer require shubo/module-shipping-shippo:@dev
+composer require shubo/module-shipping-shippo
 bin/magento module:enable Shubo_ShippingShippo
 bin/magento setup:upgrade
+bin/magento cache:flush
 ```
 
-Or, for local development on this module inside a duka container, bind-mount the standalone repo. See `/home/nika/duka/docker-compose.override.yml` for the pattern.
+For local development on this module inside a duka container, bind-mount the standalone repo. See `/home/nika/duka/docker-compose.override.yml` for the pattern.
 
 ## Configure
 
