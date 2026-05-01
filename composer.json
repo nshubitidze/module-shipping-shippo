@@ -2,7 +2,6 @@
     "name": "shubo/module-shipping-shippo",
     "description": "Shippo carrier adapter for Shubo_ShippingCore — first real carrier integration proving the carrier-agnostic abstraction (rate quote, label purchase, webhook, polling).",
     "type": "magento2-module",
-    "version": "0.2.2",
     "license": "Apache-2.0",
     "keywords": ["magento2", "shipping", "shippo", "carrier", "marketplace", "logistics"],
     "authors": [

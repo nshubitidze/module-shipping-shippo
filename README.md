@@ -1,5 +1,8 @@
 # Shubo_ShippingShippo
 
+[![Packagist](https://img.shields.io/badge/packagist-shubo%2Fmodule--shipping--shippo-orange.svg)](https://packagist.org/packages/shubo/module-shipping-shippo)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
+
 First real carrier adapter for [`Shubo_ShippingCore`](https://github.com/nshubitidze/module-shipping-core). Integrates [Shippo](https://goshippo.com) as a multi-carrier aggregator — one API key gives access to USPS, UPS, FedEx, DHL, and dozens of regional carriers.
 
 Apache 2.0 · Magento 2.4.8 · PHP ≥ 8.1.
