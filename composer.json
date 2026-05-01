@@ -23,7 +23,7 @@
         "ext-bcmath": "*",
         "ext-json": "*",
         "magento/framework": "^103.0",
-        "shubo/module-shipping-core": "^0.11.0"
+        "shubo/module-shipping-core": "^0.11.0 || ^0.12.0"
     },
     "require-dev": {
         "bitexpert/phpstan-magento": "^0.32",
